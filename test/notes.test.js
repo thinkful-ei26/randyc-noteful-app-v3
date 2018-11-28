@@ -15,7 +15,7 @@ const expect = chai.expect;
 chai.use(chaiHttp);
 
 
-//MOCHA hooks
+//MOCHA hooks ////
 
 describe('Notes API', function() {
 

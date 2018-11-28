@@ -17,34 +17,54 @@ chai.use(chaiHttp);
 
 //MOCHA hooks
 
-before(function () {
+describe('Notes API', function() {
 
-  console.log('hello');
+  before(function () {
 
-  return mongoose.connect(TEST_MONGODB_URI)
-    .then(() => mongoose.connection.db.dropDatabase());
+    console.log('hello');
 
-});
+    return mongoose.connect(TEST_MONGODB_URI)
+      .then(() => mongoose.connection.db.dropDatabase());
+
+  });
      
 
-beforeEach(function () {
+  beforeEach(function () {
 
-  return Note.insertMany(notes);
+    return Note.insertMany(notes);
  
-});
+  });
  
 
-afterEach(function () {
+  afterEach(function () {
 
-  return mongoose.connection.db.dropDatabase();
+    return mongoose.connection.db.dropDatabase();
 
-});
+  });
 
-after(function () {
+  after(function () {
 
-  return mongoose.disconnect();
+    return mongoose.disconnect();
 
-});
+  });
 
 
+  it('should return corect number of all the notes', function () {
+    
+    return chai.request(app)
+      .get('/api/notes')
+      .then((res) => {
+
+        expect(res).to.have.status(200);
+        expect(res).to.be.json;
+        expect(res.body).to.be.a('array');
+        expect(res.body).length.to.be.above(0);
+
+
+      });
  
+
+  });
+
+
+});

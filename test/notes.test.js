@@ -19,6 +19,8 @@ chai.use(chaiHttp);
 
 before(function () {
 
+  console.log('hello');
+
   return mongoose.connect(TEST_MONGODB_URI)
     .then(() => mongoose.connection.db.dropDatabase());
 

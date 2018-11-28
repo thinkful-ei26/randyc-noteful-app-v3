@@ -45,6 +45,7 @@ app.use((err, req, res, next) => {
 
 // Listen for incoming connections
 if (require.main === module) {
+
   // Connect to DB and Listen for incoming connections
   mongoose.connect(MONGODB_URI, { useNewUrlParser:true })
     .catch(err => {
@@ -56,6 +57,7 @@ if (require.main === module) {
   }).on('error', err => {
     console.error(err);
   });
+  
 }
 
 module.exports = app; // Export for testing

@@ -49,7 +49,7 @@ describe('Notes API', function() {
   });
 
 
-  it('should return corect number of all the notes', function () {
+  it('should return correct number of all the notes', function () {
     
     return chai.request(app)
       .get('/api/notes')

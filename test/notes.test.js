@@ -100,7 +100,33 @@ describe('Notes API', function() {
   });
 
 
+  it('should return correct search results for a searchTerm query', function () {
+    const searchTerm = 'reasons';
+    // const re = new RegExp(searchTerm, 'i');
+    const dbPromise = Note.find({
+      title: { $regex: searchTerm, $options: 'i' }
+      // $or: [{ 'title': re }, { 'content': re }]
+    });
+    const apiPromise = chai.request(app)
+      .get(`/api/notes?searchTerm=${searchTerm}`);
 
+    return Promise.all([dbPromise, apiPromise])
+      .then(([data, res]) => {
+        expect(res).to.have.status(200);
+        expect(res).to.be.json;
+        expect(res.body).to.be.a('array');
+        expect(res.body).to.have.length(1);
+        res.body.forEach(function (item, i) {
+          expect(item).to.be.a('object');
+          expect(item).to.include.all.keys('id', 'title', 'createdAt', 'updatedAt');
+          expect(item.id).to.equal(data[i].id);
+          expect(item.title).to.equal(data[i].title);
+          expect(item.content).to.equal(data[i].content);
+          expect(new Date(item.createdAt)).to.deep.equal(data[i].createdAt);
+          expect(new Date(item.updatedAt)).to.deep.equal(data[i].updatedAt);
+        });
+      });
+  });
 
 
 

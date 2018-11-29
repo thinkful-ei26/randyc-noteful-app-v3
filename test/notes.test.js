@@ -52,6 +52,8 @@ after(function () {
 describe('Notes API', function() { 
   it('should return correct number of all the notes', function () {
     
+    console.log('>> TEST 1');
+
     return chai.request(app)
       .get('/api/notes')
       .then((res) => {
@@ -76,6 +78,8 @@ describe('POST /api/notes', function () {
       'title': 'The best article about cats ever!',
       'content': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor...'
     };
+
+    console.log('>> TEST 2');
 
     let res;
     // 1) First, call the API
@@ -106,6 +110,9 @@ describe('POST /api/notes', function () {
 //TEST 3 GET a note with a certain ID
 describe('GET /api/notes/:id', function () {
   it('should return correct note', function () {
+
+    console.log('>> TEST 3');
+
     let data;
     // 1) First, call the database
     return Note.findOne()
@@ -133,6 +140,10 @@ describe('GET /api/notes/:id', function () {
 
 //TEST 4 GET all notes and compare
 describe('GET /api/notes', function () {
+
+  console.log('>> TEST 4');
+
+
   // 1) Call the database **and** the API
   // 2) Wait for both promises to resolve using `Promise.all`
   return Promise.all([

@@ -50,7 +50,7 @@ describe('Notes API', function() {
   //TEST 1 GET notes count 
   describe('Notes API', function() { 
 
-    console.log('>> TEST 1');
+    console.log('>> NEW TEST 1');
  
     it('should return correct number of all the notes', function () {
       
@@ -73,41 +73,73 @@ describe('Notes API', function() {
     });
   });
 
-  // //TEST 2 PUT post a new note
-  // describe('POST /api/notes', function () {
-  //   it('should create and return a new item when provided valid data', function () {
-  //     const newItem = {
-  //       'title': 'The best article about cats ever!',
-  //       'content': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor...'
-  //     };
 
-  //     console.log('>> TEST 2');
+  //TEST 2 correct keys
+  describe('Notes API', function() { 
 
-  //     let res;
-  //     // 1) First, call the API
-  //     return chai.request(app)
-  //       .post('/api/notes')
-  //       .send(newItem)
-  //       .then(function (_res) {
-  //         res = _res;
-  //         expect(res).to.have.status(201);
-  //         expect(res).to.have.header('location');
-  //         expect(res).to.be.json;
-  //         expect(res.body).to.be.a('object');
-  //         expect(res.body).to.have.keys('id', 'title', 'content', 'createdAt', 'updatedAt');
-  //         // 2) then call the database
-  //         return Note.findById(res.body.id);
-  //       })
-  //     // 3) then compare the API response to the database results
-  //       .then(data => {
-  //         expect(res.body.id).to.equal(data.id);
-  //         expect(res.body.title).to.equal(data.title);
-  //         expect(res.body.content).to.equal(data.content);
-  //         expect(new Date(res.body.createdAt)).to.eql(data.createdAt);
-  //         expect(new Date(res.body.updatedAt)).to.eql(data.updatedAt);
-  //       });
-  //   });
-  // });
+    console.log('>> NEW TEST 2');
+ 
+    it('should return correct number of fields for each note', function () {
+      
+      return Promise.all([
+        Note.find(),
+        chai.request(app).get('/api/notes')
+      ])
+
+        .then(([data,res]) => {
+
+          expect(res).to.have.status(200);
+          expect(res).to.be.json;
+          expect(res.body).to.be.a('array');
+          expect(res.body).to.have.length(data.length);
+          expect(res.body).to.have.key('title');
+          expect(res.body).to.have.key('content');
+
+        });
+ 
+
+    });
+  });
+
+
+
+
+
+  //TEST 2 PUT post a new note
+  describe('POST /api/notes', function () {
+    it('should create and return a new item when provided valid data', function () {
+      const newItem = {
+        'title': 'The best article about cats ever!',
+        'content': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor...'
+      };
+
+      console.log('>> TEST 2');
+
+      let res;
+      // 1) First, call the API
+      return chai.request(app)
+        .post('/api/notes')
+        .send(newItem)
+        .then(function (_res) {
+          res = _res;
+          expect(res).to.have.status(201);
+          expect(res).to.have.header('location');
+          expect(res).to.be.json;
+          expect(res.body).to.be.a('object');
+          expect(res.body).to.have.keys('id', 'title', 'content', 'createdAt', 'updatedAt');
+          // 2) then call the database
+          return Note.findById(res.body.id);
+        })
+      // 3) then compare the API response to the database results
+        .then(data => {
+          expect(res.body.id).to.equal(data.id);
+          expect(res.body.title).to.equal(data.title);
+          expect(res.body.content).to.equal(data.content);
+          expect(new Date(res.body.createdAt)).to.eql(data.createdAt);
+          expect(new Date(res.body.updatedAt)).to.eql(data.updatedAt);
+        });
+    });
+  });
 
   // //TEST 3 GET a note with a certain ID
   // describe('GET /api/notes/:id', function () {

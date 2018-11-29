@@ -112,6 +112,9 @@ describe('Notes API', function() {
 
     return Promise.all([dbPromise, apiPromise])
       .then(([data, res]) => {
+
+        console.log('>>> ',data);
+
         expect(res).to.have.status(200);
         expect(res).to.be.json;
         expect(res.body).to.be.a('array');

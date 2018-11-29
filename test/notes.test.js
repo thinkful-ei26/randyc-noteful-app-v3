@@ -84,11 +84,13 @@ describe('Notes API', function() {
         expect(res).to.be.json;
         expect(res.body).to.be.a('array');
         expect(res.body).to.have.length(data.length);
-        res.body.forEach(function (item, i) { 
+        res.body.forEach(function (item, i) { //setup to compare each item in the res.body array to each item in the data array
           console.log('>>> ',i);
-          expect(item).to.be.a('object');
-          expect(item).to.include.all.keys('id', 'title', 'createdAt', 'updatedAt');
-          expect(item.id).to.equal(data[i].id);
+          console.log('>>> ',data[i].id);
+          console.log('>>> ',data[i].title);
+          expect(item).to.be.a('object'); //each item in the res.body array is an object
+          expect(item).to.include.all.keys('id', 'title', 'createdAt', 'updatedAt'); //each item has these keys in the object
+          expect(item.id).to.equal(data[i].id);//forEach looks at item.id and compares to an indexed array version of item in the form of the array data
           expect(item.title).to.equal(data[i].title);
           expect(item.content).to.equal(data[i].content);
           expect(new Date(item.createdAt)).to.deep.equal(data[i].createdAt);
@@ -96,6 +98,8 @@ describe('Notes API', function() {
         });
       });
   });
+
+
 
 
 

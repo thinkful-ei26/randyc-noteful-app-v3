@@ -48,7 +48,7 @@ describe('Notes API', function() {
 
   });
 
-
+  //TEST 1 passes
   it('should return correct number of all the notes', function () {
     
     return chai.request(app)
@@ -60,6 +60,7 @@ describe('Notes API', function() {
         expect(res.body).to.be.a('array');
         expect(res.body).length.to.be.above(0);
 
+        console.log('>>>> ',res.body.length);
 
       });
  
@@ -68,3 +69,5 @@ describe('Notes API', function() {
 
 
 });
+
+

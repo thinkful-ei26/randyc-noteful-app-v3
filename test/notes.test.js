@@ -19,41 +19,42 @@ chai.use(chaiHttp);
 
 
 
-before(function () {
 
-  console.log('start hooks');
-
-  return mongoose.connect(TEST_MONGODB_URI)
-    .then(() => mongoose.connection.db.dropDatabase());
-
-});
-     
-
-beforeEach(function () {
-
-  return Note.insertMany(notes);
- 
-});
- 
-
-afterEach(function () {
-
-  return mongoose.connection.db.dropDatabase();
-
-});
-
-after(function () {
-
-  return mongoose.disconnect();
-
-});
 
 //TEST 1 GET notes count -- passes
 describe('Notes API', function() { 
-  it('should return correct number of all the notes', function () {
-    
-    console.log('>> TEST 1');
 
+  console.log('>> TEST 1');
+
+
+  before(function () {
+ 
+    return mongoose.connect(TEST_MONGODB_URI)
+      .then(() => mongoose.connection.db.dropDatabase());
+  
+  });
+       
+  beforeEach(function () {
+  
+    return Note.insertMany(notes);
+   
+  });
+    
+  afterEach(function () {
+  
+    return mongoose.connection.db.dropDatabase();
+  
+  });
+  
+  after(function () {
+  
+    return mongoose.disconnect();
+  
+  });
+ 
+  
+  it('should return correct number of all the notes', function () {
+     
     return chai.request(app)
       .get('/api/notes')
       .then((res) => {

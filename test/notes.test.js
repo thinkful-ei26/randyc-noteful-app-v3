@@ -132,7 +132,7 @@ describe('Notes API', function() {
   });
 
 
-
+  // ADD/FIX THESE
 
   // //TEST 2 PUT post a new note
   // describe('POST /api/notes', function () {

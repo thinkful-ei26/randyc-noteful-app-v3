@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const { MONGODB_URI } = require('../config');
 const Note = require('../models/note');
 const Folder = require('../models/folder');
-const Tag = require('../models/tags');
+const Tag = require('../models/tag');
 
 const { folders, notes, tags } = require('../db/seed/data');
  

@@ -10,9 +10,10 @@ const router = express.Router();
 
 router.get('/', (req, res, next) => {
 
-  const { searchTerm } = req.query;
+  const { searchTerm, folderId } = req.query;
   let filter = {};
 
+  //if there is a title input then set filter to be the input searchTerm
   if (searchTerm) {
     filter.title = { $regex: searchTerm, $options: 'i' };
 
@@ -20,6 +21,17 @@ router.get('/', (req, res, next) => {
     // const re = new RegExp(searchTerm, 'i');
     // filter.$or = [{ 'title': re }, { 'content': re }];
   }
+
+
+  //if there is a folder Id input then set filter to be the input folderId
+  if (folderId) {
+ 
+    filter.folderId = folderId;
+ 
+  }
+
+
+
 
   Note.find(filter)
     .sort({ updatedAt: 'desc' })
@@ -33,29 +45,62 @@ router.get('/:id', (req, res, next) => {
   // const noteId = req.params.id;
   const { id } = req.params;
 
-  Note.findById(id)
-    .then( result => res.json(result))
-    .catch( err => next(err));
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    const err = new Error('The `id` is not valid');
+    err.status = 400;
+    return next(err);
+  }
 
+
+  //is this is a note id or a folder id?
+
+  //find note
+  Note.findById(id)
+    .populate('folderId')
+    .then(result => {
+      if (result){
+        res.json(result);
+      } else { 
+        next();
+      }
+    })
+
+    .catch( err => {
+      next(err);
+    });
+    
 });
+ 
+
+ 
 
 /* ========== POST/CREATE AN ITEM ========== */
 router.post('/', (req, res, next) => {
 
-  const { title, content } = req.body;
+  const { title, content, folderId } = req.body;
 
-  const newNote = { title, content };
+  const newNote = { title, content, folderId };
 
   /***** Never trust users - validate input *****/
   if (!title) {
     const err = new Error('Missing `title` in request body');
     err.status = 400;
     return next(err);
+ 
   }
+
+  if (folderId && !mongoose.Types.ObjectId.isValid(folderId)) {
+    const err = new Error('The `folderId` is not valid');
+    err.status = 400;
+    return next(err);
+  }
+  
 
   Note.create(newNote)
     .then(result => {
-      res.location(`${req.originalUrl}/${result.id}`).status(201).json(result);
+      res.location(`${req.originalUrl}/${result.id}`)
+        .status(201)
+        .json(result);
     })
     .catch(err => next(err));
 
@@ -66,33 +111,38 @@ router.put('/:id', (req, res, next) => {
 
   // const noteId = req.params.id;
   const { id } = req.params;
-  const { title, content } = req.body; //updateable fields
+  const { title, content, folderId } = req.body; //updateable fields
 
   /***** Never trust users - validate input *****/
+  //Check title
   if (!title) { 
     const err = new Error('Missing `title` in request body');
     err.status = 400;
     return next(err);
+ 
   }
 
-  const updatedNote = { title, content };
+  //check id
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    const err = new Error('The `id` is not valid');
+    err.status = 400;
+    return next(err);
+  }
 
+  //check folder id
+  if (folderId && !mongoose.Types.ObjectId.isValid(folderId)) {
+    const err = new Error('The `folderId` is not valid');
+    err.status = 400;
+    return next(err);
+  }
+ 
+  const updatedNote = { title, content, folderId };
+ 
   Note.findByIdAndUpdate(id, updatedNote, { new: true, upsert: true })
     .then(result => res.json(result))
     .catch( err => next(err));
 
-  // /* Go over the difference: */
-  // Note.findByIdAndUpdate(id, updateNote, { new: true })
-  //   .then(result => {
-  //     if (result) {
-  //       res.json(result);
-  //     } else {
-  //       next();
-  //     }
-  //   })
-  //   .catch(err => {
-  //     next(err);
-  //   });
+   
 
 });
 

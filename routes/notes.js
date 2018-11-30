@@ -80,6 +80,7 @@ router.post('/', (req, res, next) => {
   const { title, content, folderId } = req.body;
 
   const newNote = { title, content, folderId };
+ 
 
   /***** Never trust users - validate input *****/
   if (!title) {
@@ -137,6 +138,15 @@ router.put('/:id', (req, res, next) => {
   }
  
   const updatedNote = { title, content, folderId };
+
+  if(folderId === ''){
+
+    delete updatedNote.folderId;
+
+    updatedNote.$unset = { folderId:'' };
+
+  }
+
  
   Note.findByIdAndUpdate(id, updatedNote, { new: true, upsert: true })
     .then(result => res.json(result))

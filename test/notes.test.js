@@ -250,13 +250,30 @@ describe('Notes API', function() {
 
           //console.log('data >>> ',data);
 
+           
+
           expect(res).to.have.status(200);
           expect(res).to.be.json;
           expect(res.body).to.be.a('array');
           expect(res.body).to.have.length(data.length);
 
+          //Check for title
+           
 
-          console.log('res.body >>> ',res.body[0]);
+
+          //check for proper keys
+          res.body.forEach(function (note){
+ 
+            expect(note).to.have.keys('id', 'title', 'content', 'folderId', 'tags', 'createdAt', 'updatedAt');
+            expect(note.title).to.be.a('string');
+            expect(note.tags).to.be.a('array');
+            expect(note.folderId).to.have.keys('name', 'createdAt', 'updatedAt', 'id');
+
+          });
+
+
+
+          //console.log('res.body >>> ',res.body);
 
           //expect(res.body).to.equal(data);
           //expect(res.body).to.have.keys('id', 'title', 'content', 'folderId', 'tags', 'createdAt', 'updatedAt');

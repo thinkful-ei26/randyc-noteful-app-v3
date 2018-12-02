@@ -73,9 +73,7 @@ router.get('/:id', (req, res, next) => {
     });
     
 });
- 
-
- 
+  
 
 /* ========== POST/CREATE AN ITEM ========== */
 router.post('/', (req, res, next) => {
@@ -94,7 +92,7 @@ router.post('/', (req, res, next) => {
   }
 
   //IS THIS RIGHT?
-  if (tags.id && !mongoose.Types.ObjectId.isValid(tags.id)) {
+  if (tags && !mongoose.Types.ObjectId.isValid(tags)) {
     const err = new Error('The `tagId` is not valid');
     err.status = 400;
     return next(err);

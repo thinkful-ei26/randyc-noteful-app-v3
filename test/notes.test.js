@@ -8,8 +8,10 @@ const app = require('../server');
 const { TEST_MONGODB_URI } = require('../config');
 
 const Note = require('../models/note');
+const Folder = require('../models/folder');
+const Tag = require('../models/tag');
 
-const { notes } = require('../db/seed/data');
+const { folders, notes, tags } = require('../db/seed/data');
 
 const expect = chai.expect;
 chai.use(chaiHttp);
@@ -17,9 +19,7 @@ chai.use(chaiHttp);
 
 //MOCHA hooks ////
 describe('Notes API', function() { 
-
-
-
+ 
   before(function () {
  
     return mongoose.connect(TEST_MONGODB_URI)
@@ -29,7 +29,16 @@ describe('Notes API', function() {
      
   beforeEach(function () {
 
-    return Note.insertMany(notes);
+    return Promise.all([
+      Note.insertMany(notes),
+
+      Folder.insertMany(folders),
+      Folder.createIndexes(),
+
+      Tag.insertMany(tags),
+      Tag.createIndexes()
+
+    ]);
  
   });
   
@@ -47,19 +56,25 @@ describe('Notes API', function() {
 
 
 
-  //TEST 1 GET notes count 
+  //TEST 1 GET notes count -- passes
   describe('Notes API', function() { 
 
     console.log('>> NEW TEST 1');
- 
+    
+    //It block
     it('should return correct number of all the notes', function () {
       
+      //Promise All block
       return Promise.all([
         Note.find(),
         chai.request(app).get('/api/notes')
       ])
 
+        
+        //then block
         .then(([data,res]) => {
+
+          //console.log('data >>> ',data);
 
           expect(res).to.have.status(200);
           expect(res).to.be.json;
@@ -73,21 +88,32 @@ describe('Notes API', function() {
     });
   });
  
-  //Serial test 1: all notes
+  //Serial test 1: all notes --  
   describe('POST /api/notes', function () {
+
+    //It block 
     it('should create and return a new item when provided valid data', function () {
+
       const newItem = {
         'title': 'The best article about cats ever!',
         'content': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor...'
       };
 
       let res;
+
+      //
       // 1) First, call the API
       return chai.request(app)
         .post('/api/notes')
         .send(newItem)
+        
+        //Then block to check integrity of the response
         .then(function (_res) {
+
           res = _res;
+
+          //console.log('res.body >>> ',res.body);
+ 
           expect(res).to.have.status(201);
           expect(res).to.have.header('location');
           expect(res).to.be.json;
@@ -96,6 +122,8 @@ describe('Notes API', function() {
           // 2) then call the database
           return Note.findById(res.body.id);
         })
+
+        //Then block to Compare the response to the  results from the seeded dataset
         // 3) then compare the API response to the database results
         .then(data => {
           expect(res.body.id).to.equal(data.id);
@@ -106,22 +134,28 @@ describe('Notes API', function() {
         });
     });
 
+
+    // It block to test for an error if title field is empty
     it('should return an error when missing "title" field', function () {
+      
+      //build a note object with no title...
       const newItem = {
         'content': 'Lorem ipsum dolor sit amet, sed do eiusmod tempor...'
       };
+
+      //Send the new item...
       return chai.request(app)
         .post('/api/notes')
         .send(newItem)
+
+        //Determine that the respones to the new item is an error
         .then(res => {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.a('object');
-          expect(res.body.message).to.equal('Missing `title` in request body');
+          expect(res).to.have.status(400);//error is 400
+          expect(res).to.be.json;//response is JSON
+          expect(res.body).to.be.a('object');//response is an object
+          expect(res.body.message).to.equal('Missing `title` in request body');//the message is correct
         });
     });
-
-
 
   });
   
@@ -173,9 +207,55 @@ describe('Notes API', function() {
     });
   });
 
+  //NEW
+  // /* ========== TEST GET/READ ALL ITEMS ========== */
+  describe('GET /api/notes', function () {
+
+    it('should get all items with correct keys', function(){
+
+       
+      return Promise.all([
+        Note.find(),
+        chai.request(app).get('/api/notes')
+      ])
+ 
+        .then(([data,res]) => {
+
+          //console.log('data >>> ',data);
+
+          expect(res).to.have.status(200);
+          expect(res).to.be.json;
+          expect(res.body).to.be.a('array');
+          expect(res.body).to.have.length(data.length);
+
+
+          console.log('res.body >>> ',res.body[0]);
+
+          //expect(res.body).to.equal(data);
+          //expect(res.body).to.have.keys('id', 'title', 'content', 'folderId', 'tags', 'createdAt', 'updatedAt');
+
+          
+
+        });
+
+        
+
+    });
+
+  });
+
+  /* ========== GET/READ A SINGLE ITEM BY ID ========== */
+
+
+  /* ========== PUT/UPDATE A SINGLE ITEM BY ID ========== */
+
+
+  /* ========== DELETE/REMOVE A SINGLE ITEM BY ID========== */
+
 
 
 });
  
 
 
+ 

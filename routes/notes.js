@@ -30,8 +30,13 @@ router.get('/', (req, res, next) => {
  
   }
 
-
-
+  //if there is a tag Id input then set filter to be the input tagId
+  if (tags) {
+ 
+    filter.tag.id = tags;
+ 
+  }
+ 
 
   Note.find(filter)
     .populate('folderId')
@@ -54,7 +59,7 @@ router.get('/:id', (req, res, next) => {
   }
 
 
-  //is this is a note id or a folder id?
+  //is this a note id or a folder id?
 
   //find note
   Note.findById(id)
@@ -91,12 +96,14 @@ router.post('/', (req, res, next) => {
  
   }
 
-  //IS THIS RIGHT?
-  if (tags && !mongoose.Types.ObjectId.isValid(tags)) {
-    const err = new Error('The `tagId` is not valid');
-    err.status = 400;
-    return next(err);
-  }
+  //Need to check all ids in the tags array!
+  tags.forEach(function (tag) {
+    if (tag && !mongoose.Types.ObjectId.isValid(tag)) {
+      const err = new Error('The `tagId` is not valid');
+      err.status = 400;
+      return next(err);
+    }
+  });
 
   if (folderId && !mongoose.Types.ObjectId.isValid(folderId)) {
     const err = new Error('The `folderId` is not valid');
@@ -132,6 +139,7 @@ router.put('/:id', (req, res, next) => {
   }
 
   //check note id
+
   if (!mongoose.Types.ObjectId.isValid(id)) {
     const err = new Error('The `id` is not valid');
     err.status = 400;
@@ -145,12 +153,14 @@ router.put('/:id', (req, res, next) => {
     return next(err);
   }
 
-  //IS THIS RIGHT?
-  if (tags.id && !mongoose.Types.ObjectId.isValid(tags.id)) {
-    const err = new Error('The `tagId` is not valid');
-    err.status = 400;
-    return next(err);
-  }
+  //Need to check all ids in the tags array!
+  tags.forEach(function (tag) {
+    if (tag && !mongoose.Types.ObjectId.isValid(tag)) {
+      const err = new Error('The `tagId` is not valid');
+      err.status = 400;
+      return next(err);
+    }
+  });
 
    
  
@@ -165,7 +175,7 @@ router.put('/:id', (req, res, next) => {
   }
 
  
-  Note.findByIdAndUpdate(id, updatedNote, { new: true, upsert: true })
+  Note.findByIdAndUpdate(id, updatedNote, { new: true })
     .then(result => res.json(result))
     .catch( err => next(err));
 

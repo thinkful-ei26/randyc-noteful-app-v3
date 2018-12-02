@@ -37,10 +37,12 @@ router.get('/:id',(req,res,next) => {
     .then(result => {
       
       if(result){
-        const err = new Error('All good!');
-        err.status = 200;//all good
+        //const err = new Error('All good!');
+        //err.status = 200;//all good
+        
+        res.status(201);//test
         res.json(result);
-      
+        
       }
       else{
          
@@ -95,9 +97,16 @@ router.put('/:id',(req,res,next) => {
     return next(err);
   }
 
+  /***** Never trust users - validate input *****/
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    const err = new Error('The `id` is not valid');
+    err.status = 400;
+    return next(err);
+  }
+
   const updatedFolder = { name };
 
-  Folder.findByIdAndUpdate(id,updatedFolder, { new: true, upsert: true })
+  Folder.findByIdAndUpdate(id,updatedFolder, { new: true })
     .then(result => res.json(result))
     .catch( err => next(err));
  
@@ -117,12 +126,19 @@ router.delete('/:id',(req,res,next) => {
     return next(err);
   }
 
+  
   Folder.findByIdAndRemove(id)
     .then(() => {
       res.sendStatus(204).end(); 
     })
     .catch(err => next(err));
+
+
+  //need to get the folder id off of afffected note(s)
+
+
+
 });
  
 
-module.exports = router;
+module.exports = router; 

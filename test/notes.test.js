@@ -86,6 +86,33 @@ describe('Notes API', function() {
  
 
     });
+
+    it('Should return correct fields', function(){
+
+      //Promise All block
+      return Promise.all([
+        Note.find(),
+        chai.request(app).get('/api/notes')
+      ])
+
+        
+        //then block
+        .then(([data,res]) => {
+          
+          //check integrity of res
+          expect(res).to.have.status(200);
+          expect(res).to.be.json;
+          expect(res.body).to.be.a('array');
+          expect(res.body).to.have.length(data.length);
+
+          
+ 
+
+        });
+
+
+    });
+
   });
  
   //Serial test 1: all notes --  

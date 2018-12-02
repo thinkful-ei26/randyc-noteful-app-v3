@@ -97,13 +97,15 @@ router.post('/', (req, res, next) => {
   }
 
   //Need to check all ids in the tags array!
-  tags.forEach(function (tag) {
-    if (tag && !mongoose.Types.ObjectId.isValid(tag)) {
-      const err = new Error('The `tagId` is not valid');
-      err.status = 400;
-      return next(err);
-    }
-  });
+  if(tags){
+    tags.forEach(function (tag) {
+      if (tag && !mongoose.Types.ObjectId.isValid(tag)) {
+        const err = new Error('The `tagId` is not valid');
+        err.status = 400;
+        return next(err);
+      }
+    });
+  }
 
   if (folderId && !mongoose.Types.ObjectId.isValid(folderId)) {
     const err = new Error('The `folderId` is not valid');
@@ -154,14 +156,15 @@ router.put('/:id', (req, res, next) => {
   }
 
   //Need to check all ids in the tags array!
-  tags.forEach(function (tag) {
-    if (tag && !mongoose.Types.ObjectId.isValid(tag)) {
-      const err = new Error('The `tagId` is not valid');
-      err.status = 400;
-      return next(err);
-    }
-  });
-
+  if(tags){ 
+    tags.forEach(function (tag) {
+      if (tag && !mongoose.Types.ObjectId.isValid(tag)) {
+        const err = new Error('The `tagId` is not valid');
+        err.status = 400;
+        return next(err);
+      }
+    });
+  }
    
  
   const updatedNote = { title, content, folderId, tags };
